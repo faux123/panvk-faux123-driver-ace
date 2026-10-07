@@ -19,6 +19,9 @@ them on my own hardware before I release it. Each release lists what it changes.
 **This is an early, experimental driver. It is not conformant, it is somewhat
 slower than the stock driver, and no game has been run on this exact build.**
 
+**This is a proof of concept, released as is, with no support.** See
+[No support](#no-support).
+
 **Everything here is verified on one device: my GameForce Ace, Mali-G610 MC4.**
 It is built for that device's kernel driver and I can make no promises anywhere
 else. See [Other devices](#other-devices-not-tested-no-guarantees).
@@ -44,7 +47,7 @@ Nothing here is a repackaged binary from somewhere else. It is built from source
 `meta.json` inside the package.
 
 The build container, the patches, the test harnesses and a recreate guide live in
-a companion repository. Ask in an issue if you want it opened up.
+a private companion repository.
 
 ### Why the stock kernel driver and not Panthor
 
@@ -122,17 +125,14 @@ Concretely, on any other device:
   freeze fix, which depends on how this device's kernel manages GPU power.
 - Nothing on this page was measured on that hardware, so none of the numbers
   apply to it.
-- I cannot reproduce what you report, so a bug there may stay open.
+- I will not look into problems on hardware I do not own.
 
-Use it if you want to, but that is the honest state of it. If you do try it, a
-[device report](../../issues/new/choose) is the most useful thing you can send
-me, and it is how other devices get supported properly instead of by assumption.
+Use it if you want to, but that is the honest state of it, and you are on your
+own with it.
 
 I build one driver per device I own, because that is the only way I can test
 it: [Retroid Pocket 4 Pro](https://github.com/faux123/panvk-faux123-driver-rp4pro)
-and [RG556](https://github.com/faux123/panvk-faux123-driver-rg556). Tips through
-the **Sponsor** button at the top of this page go toward more handhelds to test
-on. A device report costs nothing and helps just as much.
+and [RG556](https://github.com/faux123/panvk-faux123-driver-rg556).
 
 ## Installing
 
@@ -141,7 +141,7 @@ were written for Adreno and refuse or ignore a Mali package.
 [GameNative-Mali](https://github.com/faux123/GameNative-Mali/releases) can import
 it from version 1.2.1-mali.11: open **Driver Manager**, import the zip, then
 select it for a game under **Graphics**. That import screen is new and has had
-little use, so open an issue if it refuses the package.
+little use.
 
 1. Download `panvk_faux123_ace_<version>.adpkg.zip` from
    [Releases](../../releases). Do not unzip it.
@@ -162,7 +162,7 @@ To go back, select the system driver again. Nothing on the device is replaced.
 ## What works and what does not
 
 **If the device freezes:** hold the power button to reset it, go back to the
-system driver, and please open an issue. I saw several freezes on earlier builds and
+system driver. I saw several freezes on earlier builds and
 none on this one, but I cannot rule it out on a device I have not tested.
 
 **Games:** an earlier build rendered the title screen of one Windows game at 60
@@ -179,21 +179,25 @@ this build.
 build lets the GPU wait for the previous frame. The authors of the patch series I
 build from turned that mechanism off after it lost the device in rare cases in
 their conformance runs on a Mali-G615. My soak did not show it, but a soak cannot
-rule out something that rare. If an app stops rendering with this driver, tell
-me. v0.17.0 does not use that mechanism and is the fallback: it is slower, 1.64
-times stock.
+rule out something that rare. If an app stops rendering with this driver, go back to
+v0.17.0. It does not use that mechanism, and it is slower: 1.64 times stock.
 
 ---
 
-## Reporting a bug
+## No support
 
-Open an [issue](../../issues/new/choose). The bug report template asks for the
-device, the driver version, the app, and a log, because without those I cannot
-do anything with it.
+This is a proof of concept. I built this driver for my own device, and I am
+releasing it so the community can see what is possible and build on it.
 
-The most useful thing you can attach is `adb logcat` output covering the moment
-it went wrong. If the app dies, the lines beginning `F DEBUG` are the ones that
-matter. Lines beginning `E MESA` come from the driver itself.
+- There is no support from me. I do not answer bug reports or questions.
+- I do not take requests for devices I do not own. If I do not have the device,
+  I will not develop for it.
+- I do not do remote debugging or beta testing.
+- I may update this driver for myself from time to time and post it here. There
+  is no schedule and no promise.
+
+If you want to help, support the original developers listed under
+[Credits](#credits).
 
 ---
 
