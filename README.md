@@ -180,7 +180,7 @@ build lets the GPU wait for the previous frame. The authors of the patch series 
 build from turned that mechanism off after it lost the device in rare cases in
 their conformance runs on a Mali-G615. My soak did not show it, but a soak cannot
 rule out something that rare. If an app stops rendering with this driver, go back to
-v0.17.0. It does not use that mechanism, and it is slower: 1.64 times stock.
+the system driver.
 
 ---
 
