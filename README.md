@@ -16,8 +16,8 @@ see [What works and what does not](#what-works-and-what-does-not).
 I apply fixes that are not in the base I build from, and I verify every one of
 them on my own hardware before I release it. Each release lists what it changes.
 
-**This is an early, experimental driver. It is not conformant, it is slower than
-the stock driver, and no game has been run on this exact build.**
+**This is an early, experimental driver. It is not conformant, it is somewhat
+slower than the stock driver, and no game has been run on this exact build.**
 
 **Everything here is verified on one device: my GameForce Ace, Mali-G610 MC4.**
 It is built for that device's kernel driver and I can make no promises anywhere
@@ -67,7 +67,8 @@ the Ace needed.
   were mapped on this chip.
 - BC-compressed textures showed horizontal streaks on a game's title screen. The
   Mali-G610 has BC support in hardware and the driver now uses it.
-- Speed: several changes to how frames are built and presented.
+- Speed: several changes to how frames are built and presented. The largest one
+  stops the driver from blocking the app while the GPU finishes each frame.
 
 ---
 
@@ -81,8 +82,10 @@ The test rig is the Khronos [Vulkan-Samples](https://github.com/KhronosGroup/Vul
 app, rebuilt with AdrenoTools linked in so it loads a chosen driver directly. No
 Wine, no DXVK, no Box64, no emulation. One variable: the driver `.so`.
 
-- The scene that used to freeze the device ran 8 times in a row without a
-  freeze, with the kernel's power settings at their defaults.
+- A soak of 23 runs across four scenes, about 50,000 presented frames, with the
+  kernel's power settings at their defaults: every run finished, with no freeze
+  and no lost device. That includes 8 long runs of the scene that used to freeze
+  the device.
 - My feature validator: 54 checks pass and none fail. A further 41 are features
   the driver does not offer, and 53 could not be exercised.
 - I launched the samples one at a time: 51 run and 1 crashes
@@ -91,19 +94,19 @@ Wine, no DXVK, no Box64, no emulation. One variable: the driver `.so`.
 - The driver logged no errors in any of those sessions.
 
 Frame times against the stock Mali driver, over the 36 samples both drivers run:
-this driver takes 1.64 times as long by geometric mean. On five benchmark
+this driver takes 1.14 times as long by geometric mean. On five benchmark
 scenes, in milliseconds per frame:
 
 | sample | this driver | stock |
 |---|---|---|
-| `compute_nbody` | 19.3 | 17.9 |
-| `oit_linked_lists` | 21.0 | 20.6 |
-| `subpasses` | 22.8 | 17.5 |
-| `oit_depth_peeling` | 10.8 | 5.4 |
-| `terrain_tessellation` | 30.8 | does not run |
+| `compute_nbody` | 18.8 | 17.9 |
+| `oit_linked_lists` | 20.2 | 20.6 |
+| `subpasses` | 19.4 | 17.5 |
+| `oit_depth_peeling` | 4.9 | 5.4 |
+| `terrain_tessellation` | 30.4 | does not run |
 
-So this is not a speed upgrade today. What it offers is features: the stock
-driver cannot run the tessellation scene at all.
+So this is not a speed upgrade today, though it is close on these scenes. What it
+offers is features: the stock driver cannot run the tessellation scene at all.
 
 ## Other devices: not tested, no guarantees
 
@@ -170,7 +173,15 @@ this build, and no level has been played on any build.
 that this driver does not provide on the Mali-G610. I have not retried it on
 this build.
 
-**Slower than stock**, as the table above shows.
+**Somewhat slower than stock**, as the table above shows.
+
+**A known risk in how frames are presented.** To stop blocking the app, this
+build lets the GPU wait for the previous frame. The authors of the patch series I
+build from turned that mechanism off after it lost the device in rare cases in
+their conformance runs on a Mali-G615. My soak did not show it, but a soak cannot
+rule out something that rare. If an app stops rendering with this driver, tell
+me. v0.17.0 does not use that mechanism and is the fallback: it is slower, 1.64
+times stock.
 
 ---
 
