@@ -74,6 +74,11 @@ the Ace needed.
   address of one of its own helper routines in 32 bits, and on this kernel
   driver that address needs 64. The GPU jumped to the wrong place and the kernel
   shut the app's GPU context down. Fixed in v0.19.0.
+- Some games closed by themselves a minute or two after starting, at a different
+  point each time. The driver set aside room for 32 entries when an app handed
+  it a group of textures to draw with, but each texture with its sampler needs
+  two. A group of more than 16 ran past the end and overwrote whatever was
+  stored next to it. Fixed in v0.20.0.
 - Speed: several changes to how frames are built and presented. The largest one
   stops the driver from blocking the app while the GPU finishes each frame.
 
@@ -89,6 +94,9 @@ The test rig is the Khronos [Vulkan-Samples](https://github.com/KhronosGroup/Vul
 app, rebuilt with AdrenoTools linked in so it loads a chosen driver directly. No
 Wine, no DXVK, no Box64, no emulation. One variable: the driver `.so`.
 
+- v0.20.0 differs from v0.19.0 by one fix. On v0.20.0 I ran a test that hands
+  the driver 32 textures with samplers (ten runs, all passed; v0.19.0 failed
+  every run) and one game for four minutes. Nothing else below was run again.
 - v0.19.0 differs from v0.18.0 by one fix. On v0.19.0 I ran the feature
   validator, the benchmark, and the sample launch again, and played one game.
   The soak and the comparison with the stock driver below are from v0.18.0.
