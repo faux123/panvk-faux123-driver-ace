@@ -17,7 +17,7 @@ I apply fixes that are not in the base I build from, and I verify every one of
 them on my own hardware before I release it. Each release lists what it changes.
 
 **This is an early, experimental driver. It is not conformant, it is somewhat
-slower than the stock driver, and no game has been run on this exact build.**
+slower than the stock driver, and one game has been played on this exact build.**
 
 **This is a proof of concept, released as is, with no support.** See
 [No support](#no-support).
@@ -70,6 +70,10 @@ the Ace needed.
   were mapped on this chip.
 - BC-compressed textures showed horizontal streaks on a game's title screen. The
   Mali-G610 has BC support in hardware and the driver now uses it.
+- A game went black and stopped right after its menus. The driver kept the
+  address of one of its own helper routines in 32 bits, and on this kernel
+  driver that address needs 64. The GPU jumped to the wrong place and the kernel
+  shut the app's GPU context down. Fixed in v0.19.0.
 - Speed: several changes to how frames are built and presented. The largest one
   stops the driver from blocking the app while the GPU finishes each frame.
 
@@ -85,10 +89,13 @@ The test rig is the Khronos [Vulkan-Samples](https://github.com/KhronosGroup/Vul
 app, rebuilt with AdrenoTools linked in so it loads a chosen driver directly. No
 Wine, no DXVK, no Box64, no emulation. One variable: the driver `.so`.
 
-- A soak of 23 runs across four scenes, about 50,000 presented frames, with the
-  kernel's power settings at their defaults: every run finished, with no freeze
-  and no lost device. That includes 8 long runs of the scene that used to freeze
-  the device.
+- v0.19.0 differs from v0.18.0 by one fix. On v0.19.0 I ran the feature
+  validator, the benchmark, and the sample launch again, and played one game.
+  The soak and the comparison with the stock driver below are from v0.18.0.
+- On v0.18.0, a soak of 23 runs across four scenes, about 50,000 presented
+  frames, with the kernel's power settings at their defaults: every run
+  finished, with no freeze and no lost device. That includes 8 long runs of the
+  scene that used to freeze the device.
 - My feature validator: 54 checks pass and none fail. A further 41 are features
   the driver does not offer, and 53 could not be exercised.
 - I launched the samples one at a time: 51 run and 1 crashes
@@ -97,16 +104,16 @@ Wine, no DXVK, no Box64, no emulation. One variable: the driver `.so`.
 - The driver logged no errors in any of those sessions.
 
 Frame times against the stock Mali driver, over the 36 samples both drivers run:
-this driver takes 1.14 times as long by geometric mean. On five benchmark
-scenes, in milliseconds per frame:
+v0.18.0 takes 1.14 times as long by geometric mean. On five benchmark scenes,
+in milliseconds per frame (this driver on v0.19.0):
 
 | sample | this driver | stock |
 |---|---|---|
 | `compute_nbody` | 18.8 | 17.9 |
 | `oit_linked_lists` | 20.2 | 20.6 |
-| `subpasses` | 19.4 | 17.5 |
-| `oit_depth_peeling` | 4.9 | 5.4 |
-| `terrain_tessellation` | 30.4 | does not run |
+| `subpasses` | 19.3 | 17.5 |
+| `oit_depth_peeling` | 4.8 | 5.4 |
+| `terrain_tessellation` | 30.0 | does not run |
 
 So this is not a speed upgrade today, though it is close on these scenes. What it
 offers is features: the stock driver cannot run the tessellation scene at all.
@@ -165,9 +172,11 @@ To go back, select the system driver again. Nothing on the device is replaced.
 system driver. I saw several freezes on earlier builds and
 none on this one, but I cannot rule it out on a device I have not tested.
 
-**Games:** an earlier build rendered the title screen of one Windows game at 60
-frames a second through GameNative-Mali with DXVK 1.10.3. No game has been run on
-this build, and no level has been played on any build.
+**Games:** on this build, one game running in an emulator was played past the
+point where earlier builds went black, for a couple of minutes, with no driver
+error. That is the only game run on this build. An earlier build rendered the
+title screen of one Windows game at 60 frames a second through GameNative-Mali
+with DXVK 1.10.3.
 
 **DXVK 2.x:** on earlier builds it stopped at a feature (`robustBufferAccess2`)
 that this driver does not provide on the Mali-G610. I have not retried it on
