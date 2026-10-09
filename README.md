@@ -17,7 +17,7 @@ I apply fixes that are not in the base I build from, and I verify every one of
 them on my own hardware before I release it. Each release lists what it changes.
 
 **This is an early, experimental driver. It is not conformant, it is somewhat
-slower than the stock driver, and one game has been played on this exact build.**
+slower than the stock driver, and one game has been started on this exact build.**
 
 **This is a proof of concept, released as is, with no support.** See
 [No support](#no-support).
@@ -79,6 +79,14 @@ the Ace needed.
   it a group of textures to draw with, but each texture with its sampler needs
   two. A group of more than 16 ran past the end and overwrote whatever was
   stored next to it. Fixed in v0.20.0.
+- Direct3D 12 games did not start: the translation layer (vkd3d-proton) asks for
+  two robustness features, and the driver did not report them on this chip. The
+  hardware already behaves as they require, which I measured before turning them
+  on. Reported since v0.36.0.
+- A Direct3D 12 game lost the graphics device at its menu. The driver gave GPU
+  threads with small stacks and GPU threads with large stacks the same memory
+  area, so one thread could overwrite another's saved values. Each stack size
+  now has its own area. Fixed in v0.36.0.
 - Speed: several changes to how frames are built and presented. The largest one
   stops the driver from blocking the app while the GPU finishes each frame.
 
@@ -94,6 +102,15 @@ The test rig is the Khronos [Vulkan-Samples](https://github.com/KhronosGroup/Vul
 app, rebuilt with AdrenoTools linked in so it loads a chosen driver directly. No
 Wine, no DXVK, no Box64, no emulation. One variable: the driver `.so`.
 
+- v0.36.0 differs from v0.20.0 by the two Direct3D 12 changes. On v0.36.0 I
+  started one Windows game through GameNative-Mali three ways: Direct3D 12
+  (menu, then the intro film, about 14 frames a second, 4.5 minutes each, no
+  GPU fault; the same game lost the device at the menu in 20 of 20 launches
+  before the fix), Direct3D 11 (menu, 15.6 frames a second), and a Direct3D 12
+  test scene that draws and animates. My feature validator, now 66 checks each
+  run as written and deliberately broken, gave the same table as before the
+  fix: 64 proven, 2 not offered (run on the build one comment line before this
+  one). Nothing else below was run again.
 - v0.20.0 differs from v0.19.0 by one fix. On v0.20.0 I ran a test that hands
   the driver 32 textures with samplers (ten runs, all passed; v0.19.0 failed
   every run) and one game for four minutes. Nothing else below was run again.
@@ -180,15 +197,18 @@ To go back, select the system driver again. Nothing on the device is replaced.
 system driver. I saw several freezes on earlier builds and
 none on this one, but I cannot rule it out on a device I have not tested.
 
-**Games:** on this build, one game running in an emulator was played past the
-point where earlier builds went black, for a couple of minutes, with no driver
-error. That is the only game run on this build. An earlier build rendered the
-title screen of one Windows game at 60 frames a second through GameNative-Mali
-with DXVK 1.10.3.
+**Games:** on this build, one Windows game was started through GameNative-Mali
+in Direct3D 12 (vkd3d-proton 2.14.1) and in Direct3D 11 (DXVK 1.10.3). It
+reached its menu both ways, and in Direct3D 12 its intro film played. No level
+was played. That is the only game run on this build. On an earlier build, one
+game running in an emulator was played for a couple of minutes.
+
+**Direct3D 12:** set the container's DX wrapper to VKD3D. It is slow on this
+chip: about 14 frames a second at 854 by 480 in the one game I started.
 
 **DXVK 2.x:** on earlier builds it stopped at a feature (`robustBufferAccess2`)
-that this driver does not provide on the Mali-G610. I have not retried it on
-this build.
+that the driver did not report on the Mali-G610. v0.36.0 reports it. I have not
+retried a Direct3D 11 game with DXVK 2.x on this build.
 
 **Somewhat slower than stock**, as the table above shows.
 
