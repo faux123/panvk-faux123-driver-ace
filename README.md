@@ -70,6 +70,11 @@ the Ace needed.
   were mapped on this chip.
 - BC-compressed textures showed horizontal streaks on a game's title screen. The
   Mali-G610 has BC support in hardware and the driver now uses it.
+- With GameNative's own BC texture conversion left on (its default), a game
+  still showed black dashes in its textures. The app writes the converted
+  textures into driver memory that sat behind the processor's cache, and the
+  GPU read it before the cache had written it out. Since v0.39.0 that memory
+  is not cached.
 - A game went black and stopped right after its menus. The driver kept the
   address of one of its own helper routines in 32 bits, and on this kernel
   driver that address needs 64. The GPU jumped to the wrong place and the kernel
@@ -102,6 +107,10 @@ The test rig is the Khronos [Vulkan-Samples](https://github.com/KhronosGroup/Vul
 app, rebuilt with AdrenoTools linked in so it loads a chosen driver directly. No
 Wine, no DXVK, no Box64, no emulation. One variable: the driver `.so`.
 
+- v0.39.0 differs from v0.36.0 by the black dash fix. On v0.39.0 I started
+  Giana Sisters: Twisted Dreams through GameNative-Mali with its BC conversion
+  on: 11 launches are free of dashes and one stayed black from the start, which
+  I have not explained. With the fix switched off, the menus show dashes.
 - v0.36.0 differs from v0.20.0 by the two Direct3D 12 changes. On v0.36.0 I
   started one Windows game through GameNative-Mali three ways: Direct3D 12
   (menu, then the intro film, about 14 frames a second, 4.5 minutes each, no
