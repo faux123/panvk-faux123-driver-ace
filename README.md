@@ -99,6 +99,12 @@ the Ace needed.
   now has its own area. Fixed in v0.36.0.
 - Speed: several changes to how frames are built and presented. The largest one
   stops the driver from blocking the app while the GPU finishes each frame.
+- **Blending is advertised only where the GPU's blender works** since v0.40.0,
+  as Arm's driver for this GPU does. The driver used to say it could blend into
+  32-bit float images, which the Mali-G610 can only do in the shader. An app
+  that picks the widest float format it can blend into then drew twice the data
+  per pixel that it draws on the stock driver: a 4K HDR test scene took 57.6 ms
+  a frame against 33.2 ms on stock.
 
 ---
 
