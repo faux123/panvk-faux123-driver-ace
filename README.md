@@ -217,6 +217,10 @@ own with it.
 
 The same driver is released for each device I own, each in its own repository: [Pixel 7](https://github.com/faux123/panvk-faux123-driver-pixel7) (Mali-G710), [Retroid Pocket 4 Pro](https://github.com/faux123/panvk-faux123-driver-rp4pro) (Mali-G77), and [RG556](https://github.com/faux123/panvk-faux123-driver-rg556) (Mali-G57).
 
+## Video guides
+
+- What a custom GPU driver does, with Turnip and PanVK numbers (7 min): https://youtu.be/6cUdptiC218
+
 ## Installing
 
 **Read this first: you need an app that can load it.** Most driver pickers
